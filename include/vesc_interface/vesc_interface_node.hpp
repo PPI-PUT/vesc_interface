@@ -19,6 +19,12 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include "vesc_interface/vesc_interface.hpp"
+#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <tier4_vehicle_msgs/msg/vehicle_emergency_stamped.hpp>
+
+#include <std_msgs/msg/float64.hpp>
+
 
 namespace vesc_interface
 {
@@ -32,6 +38,31 @@ public:
 private:
   VescInterfacePtr vesc_interface_{nullptr};
   void foo();
+
+  // Create publishers
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_speed_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_servo_position_pub_;
+
+  // Create subscribers
+  rclcpp::Subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>::SharedPtr
+    control_command_sub_;
+  rclcpp::Subscription<autoware_auto_vehicle_msgs::msg::GearCommand>::SharedPtr
+    gear_command_sub_;
+  rclcpp::Subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>::SharedPtr
+    emergency_command_sub_;
+
+  // Create callbacks
+  void control_command_callback(
+    const autoware_auto_control_msgs::msg::AckermannControlCommand::SharedPtr msg);
+  void gear_command_callback(
+    const autoware_auto_vehicle_msgs::msg::GearCommand::SharedPtr msg);
+  void emergency_command_callback(
+    const tier4_vehicle_msgs::msg::VehicleEmergencyStamped::SharedPtr msg);
+
+  float motor_wheel_ratio_;
+  float wheel_diameter_;
+  float motor_max_rpm_;
+  float max_steer_angle_;
 };
 }  // namespace vesc_interface
 

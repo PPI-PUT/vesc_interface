@@ -15,23 +15,60 @@
 #include "vesc_interface/vesc_interface.hpp"
 
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 
 namespace vesc_interface
 {
 
-VescInterface::VescInterface()
+VescInterface::VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle) :
+  wheel_diameter_(0.0),
+  motor_ratio_(0.0),
+  max_steer_angle_(0.0)
 {
 }
 
-void VescInterface::setParameters(int64_t param_name)
+double VescInterface::get_speed(float & speed_val)
 {
-  param_name_ = param_name;
+  if (current_gear_ == Gear::PARK || emergency_stop_) {
+    return 0.0;
+  }
+
+  auto rmp_speed = speed_val * 60 / (2 * M_PI * wheel_diameter_ * motor_ratio_);
+
+  if (current_gear_ == Gear::REVERSE && rmp_speed > 0) {
+    return 0.0;
+  }
+  if (current_gear_ == Gear::FORWARD && rmp_speed < 0) {
+    return 0.0;
+  }
+
+  return rmp_speed;
 }
 
-int64_t VescInterface::printHello() const
+double VescInterface::get_stearing_angle(float & stearing_val)
 {
-  std::cout << "Hello World, " << param_name_ << std::endl;
-  return param_name_;
+  if (current_gear_ == emergency_stop_) {
+    return 0.0;
+  }
+  
+  auto clamped_stearing_cal = std::clamp(stearing_val, -max_steer_angle_, max_steer_angle_);
+  return linear_map(clamped_stearing_cal, -max_steer_angle_, max_steer_angle_, servo_min_, servo_max_);
+}
+
+void VescInterface::set_current_gear(Gear gear)
+{
+  current_gear_ = gear;
+}
+
+void VescInterface::set_emergency_stop(bool & emergency_stop)
+{
+  emergency_stop_ = emergency_stop;
+}
+
+double VescInterface::linear_map(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 }  // namespace vesc_interface

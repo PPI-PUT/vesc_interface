@@ -15,9 +15,3 @@
 #include "gtest/gtest.h"
 #include "vesc_interface/vesc_interface.hpp"
 
-TEST(TestVescInterface, TestHello) {
-  std::unique_ptr<vesc_interface::VescInterface> vesc_interface_ =
-    std::make_unique<vesc_interface::VescInterface>();
-  auto result = vesc_interface_->printHello();
-  EXPECT_EQ(result, 123);
-}

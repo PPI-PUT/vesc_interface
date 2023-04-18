@@ -23,16 +23,37 @@
 namespace vesc_interface
 {
 
+enum Gear
+{
+  FORWARD = 2,
+  REVERSE = 20,
+  PARK = 22
+};
+
 class VESC_INTERFACE_PUBLIC VescInterface
 {
 public:
-  VescInterface();
-  void setParameters(int64_t param_name);
-  int64_t printHello() const;
+  VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle);
+  double get_speed(float & speed_val);
+  double get_stearing_angle(float & stearing_val);
+
+  void set_current_gear(Gear gear);
+  void set_emergency_stop(bool & emergency_stop);
 
 private:
-  int64_t param_name_{123};
+  float wheel_diameter_{0.0};
+  float motor_ratio_{0.0};
+  float max_steer_angle_{0.0};
+  float servo_min_{0.0}; //value from vesc_driver config file
+  float servo_max_{1.0};
+ 
+  Gear current_gear_{Gear::PARK};
+  bool emergency_stop_{false};
+
+  double linear_map(float x, float in_min, float in_max, float out_min, float out_max);
 };
+
+  
 
 }  // namespace vesc_interface
 
