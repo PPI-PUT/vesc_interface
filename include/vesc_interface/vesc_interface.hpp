@@ -33,7 +33,7 @@ enum Gear
 class VESC_INTERFACE_PUBLIC VescInterface
 {
 public:
-  VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle);
+  VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle, float servo_min, float servo_max);
   double get_speed(float & speed_val);
   double get_stearing_angle(float & stearing_val);
 

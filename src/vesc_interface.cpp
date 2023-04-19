@@ -21,10 +21,14 @@
 namespace vesc_interface
 {
 
-VescInterface::VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle) :
-  wheel_diameter_(wheel_diameter),
+VescInterface::VescInterface(
+  float wheel_diameter, float motor_ratio, float max_steer_angle,
+  float servo_min, float servo_max)
+: wheel_diameter_(wheel_diameter),
   motor_ratio_(motor_ratio),
-  max_steer_angle_(max_steer_angle)
+  max_steer_angle_(max_steer_angle),
+  servo_min_(servo_min),
+  servo_max_(servo_max)
 {
 }
 
@@ -51,9 +55,11 @@ double VescInterface::get_stearing_angle(float & stearing_val)
   if (current_gear_ == emergency_stop_) {
     return 0.0;
   }
-  
+
   auto clamped_stearing_cal = std::clamp(stearing_val, -max_steer_angle_, max_steer_angle_);
-  return linear_map(clamped_stearing_cal, -max_steer_angle_, max_steer_angle_, servo_min_, servo_max_);
+  return linear_map(
+    clamped_stearing_cal, -max_steer_angle_, max_steer_angle_, servo_min_,
+    servo_max_);
 }
 
 void VescInterface::set_current_gear(Gear gear)

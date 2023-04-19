@@ -37,7 +37,6 @@ public:
 
 private:
   VescInterfacePtr vesc_interface_{nullptr};
-  void foo();
 
   // Create publishers
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_speed_pub_;
@@ -63,6 +62,9 @@ private:
   float wheel_diameter_;
   float motor_max_rpm_;
   float max_steer_angle_;
+  
+  float servo_max_;
+  float servo_min_;
 };
 }  // namespace vesc_interface
 

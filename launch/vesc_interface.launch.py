@@ -22,7 +22,9 @@ from launch_ros.substitutions import FindPackageShare
 
 def launch_setup(context, *args, **kwargs):
     pkg_prefix = FindPackageShare(LaunchConfiguration('param_file_pkg'))
+    vesc_driver_prefix = FindPackageShare('vesc_driver')
     config = PathJoinSubstitution([pkg_prefix, LaunchConfiguration('param_file')])
+    vesc_driver_config = PathJoinSubstitution([vesc_driver_prefix, 'params', 'vesc_config.yaml'])
 
     container = ComposableNodeContainer(
         name='vesc_interface_container',
@@ -35,7 +37,8 @@ def launch_setup(context, *args, **kwargs):
                     plugin='vesc_interface::VescInterfaceNode',
                     name='vesc_interface_node',
                     parameters=[
-                        config
+                        config,
+                        vesc_driver_config
                     ],
                 ),
         ],
