@@ -27,18 +27,18 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
   declare_parameter("servo_max", 0.7);
   declare_parameter("servo_min", 0.3);
 
-  get_parameter("motor_wheel_ratio", motor_wheel_ratio_);
-  get_parameter("wheel_diameter", wheel_diameter_);
-  get_parameter("motor_max_rpm", motor_max_rpm_);
-  get_parameter("max_steer_angle", max_steer_angle_);
-  get_parameter("servo_max", servo_max_);
-  get_parameter("servo_min", servo_min_);
+  get_parameter("motor_wheel_ratio", motor_wheel_ratio_param_);
+  get_parameter("wheel_diameter", wheel_diameter_param_);
+  get_parameter("motor_max_rpm", motor_max_rpm_param_);
+  get_parameter("max_steer_angle", max_steer_angle_param_);
+  get_parameter("servo_max", servo_max_param_);
+  get_parameter("servo_min", servo_min_param_);
 
   vesc_interface_ = std::make_unique<vesc_interface::VescInterface>(
-    wheel_diameter_,
-    motor_wheel_ratio_,
-    max_steer_angle_, servo_min_,
-    servo_max_, motor_max_rpm_);
+    wheel_diameter_param_,
+    motor_wheel_ratio_param_,
+    max_steer_angle_param_, servo_min_param_,
+    servo_max_param_, motor_max_rpm_param_);
 
   vesc_speed_pub_ = this->create_publisher<std_msgs::msg::Float64>(
     "/commands/motor/speed", 10);
@@ -48,7 +48,7 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
 
   gear_report_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::GearReport>(
     "/vehicle/status/gear_status", 10);
-  
+
   steering_report_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>(
     "/vehicle/status/steering_status", 10);
 
@@ -80,23 +80,29 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
     std::bind(&VescInterfaceNode::emergency_command_callback, this, std::placeholders::_1));
 
   vesc_servo_pos_sub_ =
-    this->create_subscription<std_msgs::msg::Float64>("/sensors/servo/position", 10,
+    this->create_subscription<std_msgs::msg::Float64>(
+    "/sensors/servo/position", 10,
     std::bind(&VescInterfaceNode::vesc_servo_pos_callback, this, std::placeholders::_1));
 
   vesc_state_sub_ =
-    this->create_subscription<vesc_msgs::msg::VescStateStamped>("/sensors/core", 10,
+    this->create_subscription<vesc_msgs::msg::VescStateStamped>(
+    "/sensors/core", 10,
     std::bind(&VescInterfaceNode::vesc_state_callback, this, std::placeholders::_1));
 
-  vesc_imu_sub_ = 
-    this->create_subscription<vesc_msgs::msg::VescImuStamped>("/sensors/imu", 10,
+  vesc_imu_sub_ =
+    this->create_subscription<vesc_msgs::msg::VescImuStamped>(
+    "/sensors/imu", 10,
     std::bind(&VescInterfaceNode::vesc_imu_callback, this, std::placeholders::_1));
 }
 
 void VescInterfaceNode::control_command_callback(
   const autoware_auto_control_msgs::msg::AckermannControlCommand::SharedPtr msg)
 {
-  double speed = vesc_interface_->get_speed(msg->longitudinal.speed);
-  double stearing_angle = vesc_interface_->get_stearing_angle(msg->lateral.steering_tire_angle);
+  double ackermann_vel = msg->longitudinal.speed;
+  double ackermann_steer = msg->lateral.steering_tire_angle;
+
+  double speed = vesc_interface_->get_speed(ackermann_vel);
+  double stearing_angle = vesc_interface_->get_stearing_angle(ackermann_steer);
 
   auto speed_msg = std_msgs::msg::Float64();
   speed_msg.data = speed;
@@ -106,6 +112,9 @@ void VescInterfaceNode::control_command_callback(
 
   vesc_speed_pub_->publish(speed_msg);
   vesc_servo_position_pub_->publish(stearing_angle_msg);
+
+  vesc_interface_->set_actuation_status_steer(ackermann_steer);
+  vesc_interface_->set_actuation_status_accel(ackermann_vel);
 }
 
 void VescInterfaceNode::gear_command_callback(

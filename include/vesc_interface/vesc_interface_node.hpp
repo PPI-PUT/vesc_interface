@@ -45,17 +45,19 @@ public:
 private:
   VescInterfacePtr vesc_interface_{nullptr};
 
-  // Create publishers
+  // publishers
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_speed_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_servo_position_pub_;
 
   rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::GearReport>::SharedPtr gear_report_pub_;
   rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>::SharedPtr steering_report_pub_;
-  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::ControlModeReport>::SharedPtr control_mode_report_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::ControlModeReport>::SharedPtr
+    control_mode_report_pub_;
   rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::VelocityReport>::SharedPtr velocity_report_pub_;
-  rclcpp::Publisher<tier4_vehicle_msgs::msg::ActuationStatusStamped>::SharedPtr actuation_status_pub_;
+  rclcpp::Publisher<tier4_vehicle_msgs::msg::ActuationStatusStamped>::SharedPtr
+    actuation_status_pub_;
 
-  // Create subscribers
+  // subscribers
   rclcpp::Subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>::SharedPtr
     control_command_sub_;
   rclcpp::Subscription<autoware_auto_vehicle_msgs::msg::GearCommand>::SharedPtr
@@ -69,7 +71,7 @@ private:
   rclcpp::Subscription<vesc_msgs::msg::VescImuStamped>::SharedPtr
     vesc_imu_sub_;
 
-  // Create callbacks
+  // callbacks
   void control_command_callback(
     const autoware_auto_control_msgs::msg::AckermannControlCommand::SharedPtr msg);
   void gear_command_callback(
@@ -85,13 +87,13 @@ private:
 
   void publish_raports();
 
-  float motor_wheel_ratio_; //TODO: add param prefix
-  float wheel_diameter_;
-  float motor_max_rpm_;
-  float max_steer_angle_;
-  
-  float servo_max_;
-  float servo_min_;
+  float motor_wheel_ratio_param_;
+  float wheel_diameter_param_;
+  float motor_max_rpm_param_;
+  float max_steer_angle_param_;
+
+  float servo_max_param_;
+  float servo_min_param_;
 };
 }  // namespace vesc_interface
 

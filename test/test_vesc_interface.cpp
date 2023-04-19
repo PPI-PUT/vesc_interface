@@ -17,9 +17,11 @@
 
 TEST(TestVescInterface, GetSpeedTest) {
   std::unique_ptr<vesc_interface::VescInterface> vesc_interface_ =
-    std::make_unique<vesc_interface::VescInterface>((float)0.10, (float)0.0942, (float)0.52, (float)0.15, (float)0.85, (float)50000.0);
+    std::make_unique<vesc_interface::VescInterface>(
+    (float)0.10, (float)0.0942, (float)0.52,
+    (float)0.15, (float)0.85, (float)50000.0);
 
-  float zero_speed = 0.0;
+  double zero_speed = 0.0;
   auto result = vesc_interface_->get_speed(zero_speed);
 
   float expected_zero_speed = 0.0;
