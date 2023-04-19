@@ -38,16 +38,16 @@ double VescInterface::get_speed(float & speed_val)
     return 0.0;
   }
 
-  auto rmp_speed = speed_val * 60 / (2 * M_PI * wheel_diameter_ * motor_ratio_);
+  auto rpm_speed = speed_val * 60 / (M_PI * wheel_diameter_ * motor_ratio_);
 
-  if (current_gear_ == Gear::REVERSE && rmp_speed > 0) {
+  if (current_gear_ == Gear::REVERSE && rpm_speed > 0) {
     return 0.0;
   }
-  if (current_gear_ == Gear::FORWARD && rmp_speed < 0) {
+  if (current_gear_ == Gear::FORWARD && rpm_speed < 0) {
     return 0.0;
   }
 
-  return rmp_speed;
+  return rpm_speed;
 }
 
 double VescInterface::get_stearing_angle(float & stearing_val)
@@ -57,9 +57,31 @@ double VescInterface::get_stearing_angle(float & stearing_val)
   }
 
   auto clamped_stearing_cal = std::clamp(stearing_val, -max_steer_angle_, max_steer_angle_);
-  return linear_map(
-    clamped_stearing_cal, -max_steer_angle_, max_steer_angle_, servo_min_,
-    servo_max_);
+  return steer_angle_to_servo_pos(clamped_stearing_cal);
+}
+
+VelocityModel VescInterface::get_velocity_model(double & speed_val)
+{
+  VelocityModel velocity_model;
+  velocity_model.longitudinal_velocity = speed_val * std::cos(this->current_steer_angle_);
+  velocity_model.lateral_velocity = speed_val * std::sin(this->current_steer_angle_);
+  if (this->current_steer_angle_ < 0)
+    velocity_model.lateral_velocity *= -1;
+  velocity_model.heading_rate = this->current_heading_rate_;
+
+  return velocity_model;
+}
+
+ActuationStatus VescInterface::get_actuation_status()
+{
+
+  // TODO: Implement actuation status: accel_cmd -> recent value given by autoware
+  ActuationStatus actuation_status;
+  actuation_status.brake_cmd = 0.0;
+  actuation_status.steer_cmd = linear_map(this->current_steer_angle_, -max_steer_angle_, max_steer_angle_, -1, 1);
+  actuation_status.accel_cmd = 0.0;
+
+  return actuation_status;
 }
 
 void VescInterface::set_current_gear(Gear gear)
@@ -72,9 +94,39 @@ void VescInterface::set_emergency_stop(bool & emergency_stop)
   emergency_stop_ = emergency_stop;
 }
 
+void VescInterface::set_current_steer_angle(double & steer_angle)
+{
+  current_steer_angle_ = steer_angle;
+}
+
+void VescInterface::set_current_heading_rate(double & heading_rate)
+{
+  current_heading_rate_ = heading_rate;
+}
+
+Gear VescInterface::get_current_gear()
+{
+  return current_gear_;
+}
+
+double VescInterface::get_current_steer_angle()
+{
+  return current_steer_angle_;
+}
+
 double VescInterface::linear_map(float x, float in_min, float in_max, float out_min, float out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+double VescInterface::servo_pos_to_steer_angle(double & servo_pos)
+{
+  return linear_map(servo_pos, servo_min_, servo_max_, -max_steer_angle_, max_steer_angle_);
+}
+
+double VescInterface::steer_angle_to_servo_pos(float & steer_angle)
+{
+  return linear_map(steer_angle, -max_steer_angle_, max_steer_angle_, servo_min_, servo_max_);
 }
 
 }  // namespace vesc_interface

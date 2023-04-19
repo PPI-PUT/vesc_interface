@@ -21,7 +21,14 @@
 #include "vesc_interface/vesc_interface.hpp"
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <tier4_vehicle_msgs/msg/vehicle_emergency_stamped.hpp>
+#include <tier4_vehicle_msgs/msg/actuation_status_stamped.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
+#include <vesc_msgs/msg/vesc_imu_stamped.hpp>
 
 #include <std_msgs/msg/float64.hpp>
 
@@ -42,6 +49,12 @@ private:
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_speed_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr vesc_servo_position_pub_;
 
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::GearReport>::SharedPtr gear_report_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>::SharedPtr steering_report_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::ControlModeReport>::SharedPtr control_mode_report_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::VelocityReport>::SharedPtr velocity_report_pub_;
+  rclcpp::Publisher<tier4_vehicle_msgs::msg::ActuationStatusStamped>::SharedPtr actuation_status_pub_;
+
   // Create subscribers
   rclcpp::Subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>::SharedPtr
     control_command_sub_;
@@ -49,6 +62,12 @@ private:
     gear_command_sub_;
   rclcpp::Subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>::SharedPtr
     emergency_command_sub_;
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr
+    vesc_servo_pos_sub_;
+  rclcpp::Subscription<vesc_msgs::msg::VescStateStamped>::SharedPtr
+    vesc_state_sub_;
+  rclcpp::Subscription<vesc_msgs::msg::VescImuStamped>::SharedPtr
+    vesc_imu_sub_;
 
   // Create callbacks
   void control_command_callback(
@@ -57,8 +76,16 @@ private:
     const autoware_auto_vehicle_msgs::msg::GearCommand::SharedPtr msg);
   void emergency_command_callback(
     const tier4_vehicle_msgs::msg::VehicleEmergencyStamped::SharedPtr msg);
+  void vesc_servo_pos_callback(
+    const std_msgs::msg::Float64::SharedPtr msg);
+  void vesc_state_callback(
+    const vesc_msgs::msg::VescStateStamped::SharedPtr msg);
+  void vesc_imu_callback(
+    const vesc_msgs::msg::VescImuStamped::SharedPtr msg);
 
-  float motor_wheel_ratio_;
+  void publish_raports();
+
+  float motor_wheel_ratio_; //TODO: add param prefix
   float wheel_diameter_;
   float motor_max_rpm_;
   float max_steer_angle_;
