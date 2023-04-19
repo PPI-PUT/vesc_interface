@@ -46,7 +46,7 @@ class VESC_INTERFACE_PUBLIC VescInterface
 {
 public:
   VescInterface() = default;
-  VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle, float servo_min, float servo_max);
+  VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle, float servo_min, float servo_max, float motor_max_rpm);
   double get_speed(float & speed_val);
   double get_stearing_angle(float & stearing_val);
   VelocityModel get_velocity_model(double & speed_val);
@@ -56,6 +56,8 @@ public:
   void set_emergency_stop(bool & emergency_stop);
   void set_current_steer_angle(double & steer_angle);
   void set_current_heading_rate(double & heading_rate);
+  void set_actuation_status_accel(double & accel_cmd);
+  void set_actuation_status_steer(double & steer_cmd);
 
   Gear get_current_gear();
   double get_current_steer_angle();
@@ -66,19 +68,22 @@ private:
   float wheel_diameter_{0.1};
   float motor_ratio_{0.01};
   float max_steer_angle_{0.5};
-  float servo_min_{0.15}; //value from vesc_driver config file
+  float servo_min_{0.15}; // value from vesc_driver config file
   float servo_max_{0.85};
+  float motor_max_rpm_{50000.0}; //TOdO: get from config file
  
   Gear current_gear_{Gear::PARK};
   bool emergency_stop_{false};
+
+  // keep values from autoware and return it
+  ActuationStatus actuation_status_{0.0, 0.0, 0.0};
+
   double current_steer_angle_{0.0};
   double current_heading_rate_{0.0};
 
   double linear_map(float x, float in_min, float in_max, float out_min, float out_max);
   double steer_angle_to_servo_pos(float & steer_angle);
 };
-
-  
 
 }  // namespace vesc_interface
 

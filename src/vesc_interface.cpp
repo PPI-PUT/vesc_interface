@@ -23,12 +23,13 @@ namespace vesc_interface
 
 VescInterface::VescInterface(
   float wheel_diameter, float motor_ratio, float max_steer_angle,
-  float servo_min, float servo_max)
+  float servo_min, float servo_max, float motor_max_rpm)
 : wheel_diameter_(wheel_diameter),
   motor_ratio_(motor_ratio),
   max_steer_angle_(max_steer_angle),
   servo_min_(servo_min),
-  servo_max_(servo_max)
+  servo_max_(servo_max),
+  motor_max_rpm_(motor_max_rpm)
 {
 }
 
@@ -74,14 +75,7 @@ VelocityModel VescInterface::get_velocity_model(double & speed_val)
 
 ActuationStatus VescInterface::get_actuation_status()
 {
-
-  // TODO: Implement actuation status: accel_cmd -> recent value given by autoware
-  ActuationStatus actuation_status;
-  actuation_status.brake_cmd = 0.0;
-  actuation_status.steer_cmd = linear_map(this->current_steer_angle_, -max_steer_angle_, max_steer_angle_, -1, 1);
-  actuation_status.accel_cmd = 0.0;
-
-  return actuation_status;
+  return this->actuation_status_;
 }
 
 void VescInterface::set_current_gear(Gear gear)
@@ -102,6 +96,18 @@ void VescInterface::set_current_steer_angle(double & steer_angle)
 void VescInterface::set_current_heading_rate(double & heading_rate)
 {
   current_heading_rate_ = heading_rate;
+}
+
+void VescInterface::set_actuation_status_accel(double & accel)
+{
+  //ToDo: map speed from rpm to (0, 1)
+  this->actuation_status_.accel_cmd = linear_map(accel, 0.0, motor_max_rpm_, 0.0, 1.0);
+}
+
+void VescInterface::set_actuation_status_steer(double & steer)
+{
+  // Map input steer from autoware (rad) to (-1, 1)
+  this->actuation_status_.steer_cmd = linear_map(steer, -max_steer_angle_, max_steer_angle_, -1, 1);
 }
 
 Gear VescInterface::get_current_gear()

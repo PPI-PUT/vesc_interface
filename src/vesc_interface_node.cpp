@@ -38,7 +38,7 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
     wheel_diameter_,
     motor_wheel_ratio_,
     max_steer_angle_, servo_min_,
-    servo_max_);
+    servo_max_, motor_max_rpm_);
 
   vesc_speed_pub_ = this->create_publisher<std_msgs::msg::Float64>(
     "/commands/motor/speed", 10);
@@ -163,9 +163,12 @@ void VescInterfaceNode::publish_raports()
   control_mode_report_msg.mode = control_mode_report_msg.AUTONOMOUS;
   control_mode_report_pub_->publish(control_mode_report_msg);
 
+  ActuationStatus actuation_status = vesc_interface_->get_actuation_status();
   auto actuation_status_report_msg = tier4_vehicle_msgs::msg::ActuationStatusStamped();
   actuation_status_report_msg.header.stamp = this->now();
-  
+  actuation_status_report_msg.status.accel_status = actuation_status.accel_cmd;
+  actuation_status_report_msg.status.brake_status = actuation_status.brake_cmd;
+  actuation_status_report_msg.status.steer_status = actuation_status.steer_cmd;
   actuation_status_pub_->publish(actuation_status_report_msg);
 }
 
