@@ -22,9 +22,9 @@ namespace vesc_interface
 {
 
 VescInterface::VescInterface(float wheel_diameter, float motor_ratio, float max_steer_angle) :
-  wheel_diameter_(0.0),
-  motor_ratio_(0.0),
-  max_steer_angle_(0.0)
+  wheel_diameter_(wheel_diameter),
+  motor_ratio_(motor_ratio),
+  max_steer_angle_(max_steer_angle)
 {
 }
 
