@@ -74,6 +74,7 @@ private:
   float servo_min_param_{0.15};
   float servo_max_param_{0.85};
   float motor_max_rpm_param_{50000.0};
+  const float max_vel_m_s_;
 
   Gear current_gear_{Gear::PARK};
   bool emergency_stop_{false};

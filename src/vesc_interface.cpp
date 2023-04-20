@@ -29,8 +29,10 @@ VescInterface::VescInterface(
   max_steer_angle_param_(max_steer_angle),
   servo_min_param_(servo_min),
   servo_max_param_(servo_max),
-  motor_max_rpm_param_(motor_max_rpm)
+  motor_max_rpm_param_(motor_max_rpm),
+  max_vel_m_s_(motor_max_rpm_param_ * motor_ratio_ * M_PI * wheel_diameter_param_ / 60.0)
 {
+
 }
 
 double VescInterface::get_speed(double & speed_val)
