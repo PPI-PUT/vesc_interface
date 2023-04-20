@@ -65,7 +65,6 @@ public:
 
   Gear get_current_gear();
   double get_current_steer_angle();
-
   double servo_pos_to_steer_angle(double & servo_pos);
 
 private:
@@ -78,11 +77,10 @@ private:
 
   Gear current_gear_{Gear::PARK};
   bool emergency_stop_{false};
-
-  ActuationStatus actuation_status_{0.0, 0.0, 0.0};
-
   double current_steer_angle_{0.0};
   double current_heading_rate_{0.0};
+
+  ActuationStatus actuation_status_{0.0, 0.0, 0.0};
 
   double linear_map(float x, float in_min, float in_max, float out_min, float out_max);
   double steer_angle_to_servo_pos(double & steer_angle);

@@ -81,7 +81,7 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
 
   vesc_servo_pos_sub_ =
     this->create_subscription<std_msgs::msg::Float64>(
-    "/sensors/servo/position", 10,
+    "/sensors/servo_position_command", 10,
     std::bind(&VescInterfaceNode::vesc_servo_pos_callback, this, std::placeholders::_1));
 
   vesc_state_sub_ =
