@@ -137,14 +137,7 @@ void VescInterfaceNode::emergency_command_callback(
 void VescInterfaceNode::vesc_servo_pos_callback(const std_msgs::msg::Float64::SharedPtr msg)
 {
   double steer_angle = vesc_interface_->servo_pos_to_steer_angle(msg->data);
-  auto steering_report_msg = autoware_auto_vehicle_msgs::msg::SteeringReport();
-  steering_report_msg.stamp = this->now();
-  steering_report_msg.steering_tire_angle = steer_angle;
-  steering_report_pub_->publish(steering_report_msg);
-
   vesc_interface_->set_current_steer_angle(steer_angle);
-
-  publish_raports();
 }
 
 void VescInterfaceNode::vesc_state_callback(const vesc_msgs::msg::VescStateStamped::SharedPtr msg)
@@ -158,6 +151,8 @@ void VescInterfaceNode::vesc_state_callback(const vesc_msgs::msg::VescStateStamp
   velocity_report_msg.heading_rate = vel_model.heading_rate;
 
   velocity_report_pub_->publish(velocity_report_msg);
+
+  publish_raports();
 }
 
 void VescInterfaceNode::vesc_imu_callback(const vesc_msgs::msg::VescImuStamped::SharedPtr msg)
@@ -179,6 +174,11 @@ void VescInterfaceNode::publish_raports()
   actuation_status_report_msg.status.brake_status = actuation_status.brake_cmd;
   actuation_status_report_msg.status.steer_status = actuation_status.steer_cmd;
   actuation_status_pub_->publish(actuation_status_report_msg);
+
+  auto steering_report_msg = autoware_auto_vehicle_msgs::msg::SteeringReport();
+  steering_report_msg.stamp = this->now();
+  steering_report_msg.steering_tire_angle = vesc_interface_->get_current_steer_angle();
+  steering_report_pub_->publish(steering_report_msg);
 }
 
 }  // namespace vesc_interface
