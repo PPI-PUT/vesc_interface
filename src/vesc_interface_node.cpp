@@ -121,11 +121,6 @@ void VescInterfaceNode::gear_command_callback(
   const autoware_auto_vehicle_msgs::msg::GearCommand::SharedPtr msg)
 {
   vesc_interface_->set_current_gear((Gear)msg->command);
-
-  auto gear_report_msg = autoware_auto_vehicle_msgs::msg::GearReport();
-  gear_report_msg.stamp = this->now();
-  gear_report_msg.report = vesc_interface_->get_current_gear();
-  gear_report_pub_->publish(gear_report_msg);
 }
 
 void VescInterfaceNode::emergency_command_callback(
@@ -181,6 +176,11 @@ void VescInterfaceNode::publish_raports()
   steering_report_msg.stamp = this->now();
   steering_report_msg.steering_tire_angle = vesc_interface_->get_current_steer_angle();
   steering_report_pub_->publish(steering_report_msg);
+
+  auto gear_report_msg = autoware_auto_vehicle_msgs::msg::GearReport();
+  gear_report_msg.stamp = this->now();
+  gear_report_msg.report = vesc_interface_->get_current_gear();
+  gear_report_pub_->publish(gear_report_msg);
 }
 
 }  // namespace vesc_interface
