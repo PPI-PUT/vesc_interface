@@ -146,6 +146,7 @@ void VescInterfaceNode::vesc_state_callback(const vesc_msgs::msg::VescStateStamp
 
   auto velocity_report_msg = autoware_auto_vehicle_msgs::msg::VelocityReport();
   velocity_report_msg.header.stamp = this->now();
+  velocity_report_msg.header.frame_id = "base_link";
   velocity_report_msg.longitudinal_velocity = vel_model.longitudinal_velocity;
   velocity_report_msg.lateral_velocity = vel_model.lateral_velocity;
   velocity_report_msg.heading_rate = vel_model.heading_rate;
@@ -170,6 +171,7 @@ void VescInterfaceNode::publish_raports()
   ActuationStatus actuation_status = vesc_interface_->get_actuation_status();
   auto actuation_status_report_msg = tier4_vehicle_msgs::msg::ActuationStatusStamped();
   actuation_status_report_msg.header.stamp = this->now();
+  actuation_status_report_msg.header.frame_id = "base_link";
   actuation_status_report_msg.status.accel_status = actuation_status.accel_cmd;
   actuation_status_report_msg.status.brake_status = actuation_status.brake_cmd;
   actuation_status_report_msg.status.steer_status = actuation_status.steer_cmd;
