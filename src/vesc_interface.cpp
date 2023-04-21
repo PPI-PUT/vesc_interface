@@ -32,7 +32,6 @@ VescInterface::VescInterface(
   motor_max_rpm_param_(motor_max_rpm),
   max_vel_m_s_(motor_max_rpm_param_ * motor_ratio_ * M_PI * wheel_diameter_param_ / 60.0)
 {
-
 }
 
 double VescInterface::get_speed(double & speed_val)
@@ -105,7 +104,7 @@ void VescInterface::set_current_heading_rate(double & heading_rate)
 
 void VescInterface::set_actuation_status_accel(double & accel)
 {
-  this->actuation_status_.accel_cmd = linear_map(accel, 0.0, motor_max_rpm_param_, 0.0, 1.0);
+  this->actuation_status_.accel_cmd = linear_map(accel, 0.0, max_vel_m_s_, 0.0, 1.0);
 }
 
 void VescInterface::set_actuation_status_steer(double & steer)
