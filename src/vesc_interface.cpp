@@ -67,8 +67,10 @@ double VescInterface::get_stearing_angle(double & stearing_val)
 VelocityModel VescInterface::get_velocity_model(double & speed_val)
 {
   VelocityModel velocity_model;
-  velocity_model.longitudinal_velocity = speed_val * std::cos(this->current_steer_angle_);
-  velocity_model.lateral_velocity = speed_val * std::sin(this->current_steer_angle_);
+  auto m_s_speed = speed_val * motor_ratio_ * M_PI * wheel_diameter_param_ / 60.0;
+
+  velocity_model.longitudinal_velocity = m_s_speed * std::cos(this->current_steer_angle_);
+  velocity_model.lateral_velocity = m_s_speed * std::sin(this->current_steer_angle_);
   if (this->current_steer_angle_ < 0) {
     velocity_model.lateral_velocity *= -1;
   }
