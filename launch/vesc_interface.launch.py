@@ -34,6 +34,7 @@ def launch_setup(context, *args, **kwargs):
         composable_node_descriptions=[
                 ComposableNode(
                     package='vesc_interface',
+                    # remappings=[("/sensors/imu", "/imu")],
                     plugin='vesc_interface::VescInterfaceNode',
                     name='vesc_interface_node',
                     parameters=[
