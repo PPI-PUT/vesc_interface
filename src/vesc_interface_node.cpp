@@ -47,31 +47,44 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
     "/commands/servo/position", 10);
 
   gear_report_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::GearReport>(
-    "/vehicle/status/gear_status", 10);
+    "/vehicle/status/gear_status", 1);
 
   steering_report_pub_ = this->create_publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>(
-    "/vehicle/status/steering_status", 10);
+    "/vehicle/status/steering_status", 1);
 
   control_mode_report_pub_ =
     this->create_publisher<autoware_auto_vehicle_msgs::msg::ControlModeReport>(
-    "/vehicle/status/control_mode", 10);
+    "/vehicle/status/control_mode", 1);
 
   velocity_report_pub_ =
     this->create_publisher<autoware_auto_vehicle_msgs::msg::VelocityReport>(
-    "/vehicle/status/velocity_status", 10);
+    "/vehicle/status/velocity_status", 1);
 
   actuation_status_pub_ =
     this->create_publisher<tier4_vehicle_msgs::msg::ActuationStatusStamped>(
-    "/vehicle/status/actuation_status", 10);
+    "/vehicle/status/actuation_status", 1);
 
+  rclcpp::QoS qos_profile_ackermann = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default))
+      .history(rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST)
+      .keep_last(1)
+      .reliability(rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_RELIABLE)
+      .durability(rmw_qos_durability_policy_t::RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL)
+      .avoid_ros_namespace_conventions(false);
 
   control_command_sub_ =
     this->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>(
-    "/control/command/control_cmd", 10,
+    "/control/command/control_cmd", qos_profile_ackermann,
     std::bind(&VescInterfaceNode::control_command_callback, this, std::placeholders::_1));
 
+  rclcpp::QoS qos_profile_gearcommand = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default))
+      .history(rmw_qos_history_policy_t::RMW_QOS_POLICY_HISTORY_KEEP_LAST)
+      .keep_last(1)
+      .reliability(rmw_qos_reliability_policy_t::RMW_QOS_POLICY_RELIABILITY_RELIABLE)
+      .durability(rmw_qos_durability_policy_t::RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL)
+      .avoid_ros_namespace_conventions(false);
+
   gear_command_sub_ = this->create_subscription<autoware_auto_vehicle_msgs::msg::GearCommand>(
-    "/control/command/gear_cmd", 10,
+    "/control/command/gear_cmd", qos_profile_gearcommand,
     std::bind(&VescInterfaceNode::gear_command_callback, this, std::placeholders::_1));
 
   emergency_command_sub_ =
