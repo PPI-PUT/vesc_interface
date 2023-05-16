@@ -111,7 +111,7 @@ VescInterfaceNode::VescInterfaceNode(const rclcpp::NodeOptions & options)
 void VescInterfaceNode::control_command_callback(
   const autoware_auto_control_msgs::msg::AckermannControlCommand::SharedPtr msg)
 {
-  double ackermann_vel = msg->longitudinal.speed;
+  double ackermann_vel = msg->longitudinal.acceleration;
   double ackermann_steer = msg->lateral.steering_tire_angle;
 
   double speed = vesc_interface_->get_speed(ackermann_vel);
@@ -144,7 +144,7 @@ void VescInterfaceNode::emergency_command_callback(
 
 void VescInterfaceNode::vesc_servo_pos_callback(const std_msgs::msg::Float64::SharedPtr msg)
 {
-  double steer_angle = vesc_interface_->servo_pos_to_steer_angle(msg->data);
+  double steer_angle = -vesc_interface_->servo_pos_to_steer_angle(msg->data);
   vesc_interface_->set_current_steer_angle(steer_angle);
 }
 

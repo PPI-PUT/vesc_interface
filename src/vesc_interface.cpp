@@ -58,7 +58,7 @@ double VescInterface::get_stearing_angle(double & stearing_val)
     return 0.0;
   }
 
-  auto clamped_stearing_cal = std::clamp(
+  auto clamped_stearing_cal = -std::clamp(
     stearing_val, -(double)max_steer_angle_param_,
     (double)max_steer_angle_param_);
   return steer_angle_to_servo_pos(clamped_stearing_cal);

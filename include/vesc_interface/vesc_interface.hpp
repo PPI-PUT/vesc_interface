@@ -76,7 +76,7 @@ private:
   float motor_max_rpm_param_{50000.0};
   const float max_vel_m_s_;
 
-  Gear current_gear_{Gear::PARK};
+  Gear current_gear_{Gear::FORWARD};
   bool emergency_stop_{false};
   double current_steer_angle_{0.0};
   double current_heading_rate_{0.0};
