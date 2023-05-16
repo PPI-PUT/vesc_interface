@@ -1,6 +1,7 @@
 # vesc_interface
 <!-- Required -->
 <!-- Package description -->
+Package provides an interface to communicate the VESC motor controller with Autoware stack. It is implementation of vehicle interface component of Autoware stack for VESC motor controller.
 
 ## Installation
 <!-- Required -->
@@ -32,19 +33,20 @@ ros2 launch vesc_interface vesc_interface.launch.py
 
 | Name         | Type                  | Description  |
 | ------------ | --------------------- | ------------ |
-| `topic_name` | std_msgs::msg::String | Sample desc. |
+| `/control/command/control_cmd` | autoware_auto_control_msgs::msg::AckermannControlCommand | autoware steering command |
+| `/control/command/emergency_cmd` | tier4_vehicle_msgs::msg::VehicleEmergencyStamped | autoware emergency command |
+| `/control/command/gear_cmd` | autoware_auto_vehicle_msgs::msg::GearCommand | autoware gear command |
 
 ### Output
 
 | Name         | Type                  | Description  |
 | ------------ | --------------------- | ------------ |
-| `topic_name` | std_msgs::msg::String | Sample desc. |
+| `/vehicle/status/control_mode` | autoware_auto_vehicle_msgs::msg::ControlModeReport | Sample desc. |
+| `/vehicle/status/gear_status` | autoware_auto_vehicle_msgs::msg::GearReport | Sample desc. |
+| `/vehicle/status/steering_status` | autoware_auto_vehicle_msgs::msg::SteeringReport | Sample desc. |
+| `/vehicle/status/velocity_status` | autoware_auto_vehicle_msgs::msg::VelocityReport | Sample desc. |
+| `/vehicle/status/actuation_status` | tier4_vehicle_msgs::msg::ActuationStatusStamped | Sample desc. |
 
-### Services and Actions
-
-| Name           | Type                   | Description  |
-| -------------- | ---------------------- | ------------ |
-| `service_name` | std_srvs::srv::Trigger | Sample desc. |
 
 ### Parameters
 
@@ -55,3 +57,5 @@ ros2 launch vesc_interface vesc_interface.launch.py
 
 ## References / External links
 <!-- Optional -->
+- about Autoware vehicle interface [link](https://autowarefoundation.github.io/autoware-documentation/main/design/autoware-interfaces/components/vehicle-interface/)
+- about ROS2 VESC motor driver [link](https://github.com/f1tenth/vesc/tree/ros2)
